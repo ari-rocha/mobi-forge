@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}Demo{% endblock %}</title>
+  </head>
+  <body>
+    <header>{% include 'partials/header.html' %}</header>
+    <main>{% block content %}{% endblock %}</main>
+    <footer>{% include 'partials/footer.html' %}</footer>
+  </body>
+</html>

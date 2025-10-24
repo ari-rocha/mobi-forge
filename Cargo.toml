@@ -1,0 +1,34 @@
+[package]
+name = "mobi-forge"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+# Web
+axum = { version = "0.7", features = ["macros"] }
+hyper = { version = "1", features = ["http1", "server"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tower = "0.5"
+
+
+# Templates
+minijinja = { version = "2", features = ["loader", "deserialization", "fuel"] }
+
+
+# DB & Cache
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "macros", "uuid", "chrono", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+moka = { version = "0.12", features = ["future"] }
+
+
+# Config & Utils
+anyhow = "1"
+config = "0.14"
+dotenvy = "0.15"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1"

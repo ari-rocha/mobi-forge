@@ -1,0 +1,4 @@
+{% extends 'layout.html' %} {% block title %}Home - Demo{% endblock %} {% block
+content %}
+<p>Hello, {{ user.name | default('world') }}!</p>
+{% endblock %}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ site.title }} – Welcome</title>
+  </head>
+  <body>
+    <header>
+      <h1>{{ site.title }}</h1>
+      <p>Slug: {{ site.slug }}</p>
+    </header>
+
+    <main>
+      <p>Current time: {{ now() }}</p>
+      <p>
+        This is the default home template. Customize me per tenant by creating
+        `templates/{{ site.slug }}/index.html`.
+      </p>
+    </main>
+  </body>
+</html>
