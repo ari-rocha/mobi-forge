@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+{% import 'macros/products.jinja' as product_ui %}
+{% import 'macros/utils.jinja' as util %}
+
+{% block title %}{{ page.title }} — {{ site.title }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <header class="section-header">
+    <h1>{{ page.heading }}</h1>
+    <p>{{ page.description }}</p>
+  </header>
+
+  {%- set filters_data = filters | default({}, true) -%}
+  {% if filters_data and filters_data.groups is defined and filters_data.groups %}
+  <div class="filters">
+    {% for group in filters_data.groups %}
+    <article class="filter-card">
+      <h3>{{ group.title }}</h3>
+      <ul>
+        {% for option in group.options %}
+        <li>
+          <a href="{{ util.tenant_href('catalog') }}?{{ option.query }}">
+            {{ option.label }}
+          </a>
+          {% if option.count is defined %}
+          <span class="filter-count">{{ option.count }}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {%- set product_source = products | default([], true) -%}
+  {%- set product_list = product_source.items
+      if product_source is mapping and product_source.items is defined
+      else product_source -%}
+  {%- if product_list and product_list | length > 0 -%}
+    {{ product_ui.grid(product_list) }}
+  {%- else -%}
+    <p class="product-grid__empty">No products available yet.</p>
+  {%- endif -%}
+</section>
+{% endblock %}

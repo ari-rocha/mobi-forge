@@ -1,0 +1,14 @@
+{
+  "site": {
+    "title": "Mobi Store",
+    "slug": "store"
+  },
+  "product": {
+    "provider": "http",
+    "url": "https://api.mobicms.com.br/api/furnitures/{{product_id}}",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer {{env.MOBI_API_TOKEN}}"
+    }
+  }
+}

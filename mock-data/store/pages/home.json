@@ -1,0 +1,41 @@
+{
+  "site": {
+    "title": "Mobi Store",
+    "slug": "store",
+    "tagline": "Better goods for everyday rituals"
+  },
+  "page": {
+    "title": "Demo Store",
+    "hero": {
+      "heading": "Preview your Mobi catalog in minutes",
+      "subheading": "This tenant shows how Mobi Forge renders live catalog, product detail, and search views using your MobiCMS data."
+    },
+    "overview": {
+      "title": "What you can try",
+      "description": "Navigate the catalog, open any product, or run a search to see how Mobi Forge renders real storefront data fetched from the MobiCMS API."
+    },
+    "checklist": {
+      "title": "Quick tour",
+      "items": [
+        {
+          "title": "Browse the catalog",
+          "description": "Loads the furniture collection from the MobiCMS furnitures endpoint and renders cards with pricing and imagery.",
+          "link": "catalog",
+          "cta": "Open catalog"
+        },
+        {
+          "title": "Search for a product",
+          "description": "Passes your query directly to the API and displays the returned matches in the shared product card layout.",
+          "link": "search",
+          "cta": "Try search"
+        },
+        {
+          "title": "Inspect a product page",
+          "description": "Each catalog result links to a dedicated product view that reads specifications, gallery, and pricing from the API response.",
+          "link": "products/banco-cubo",
+          "cta": "Open product"
+        }
+      ]
+    }
+  }
+}

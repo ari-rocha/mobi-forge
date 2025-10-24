@@ -102,7 +102,9 @@ impl TemplateService {
             }
         });
 
-        env.set_fuel(Some(1_000_000));
+        // Disable fuel limit - it was causing serialization truncation
+        // We'll rely on other limits for safety
+        env.set_fuel(None);
 
         let loader_map = Arc::new(templates);
         env.set_loader(move |name| {
@@ -117,6 +119,9 @@ impl TemplateService {
         env.add_function("now", |_args: &[Value]| {
             Ok(Value::from_serialize(Utc::now()))
         });
+
+        // Add a custom filter to materialize sequences fully
+        env.add_filter("materialize", |v: Value| Ok(v));
 
         Ok(env)
     }

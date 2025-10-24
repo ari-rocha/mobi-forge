@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+{% import 'macros/products.jinja' as product_ui %}
+{% import 'macros/utils.jinja' as util %}
+
+{% set search_query = q | default(page.query | default('', true), true) %}
+
+{% block title %}Search "{{ search_query }}" — {{ site.title }}{% endblock %}
+
+{% block content %}
+  <section class="section">
+    <header class="section-header">
+      <h1>{{ page.heading }}</h1>
+      <p>{{ page.description }}</p>
+      <form class="search-form" action="{{ util.tenant_href('search') }}" method="get">
+        <label class="sr-only" for="search-query">Search products</label>
+        <input
+          id="search-query"
+          type="search"
+          name="q"
+          value="{{ search_query }}"
+          placeholder="Search by product or tag"
+        />
+        <button class="btn btn-primary" type="submit">Search</button>
+      </form>
+    </header>
+
+    {%- set results_source = results | default([], true) -%}
+    {%- set results_list = results_source.items
+        if results_source is mapping and results_source.items is defined
+        else results_source -%}
+    {%- set result_count = results_source.count
+        if results_source is mapping and results_source.count is defined
+        else (results_list | length | default(0)) -%}
+
+    {%- if search_query %}
+      <div class="search-summary">
+        <strong>{{ result_count }}</strong>
+        {% if result_count == 1 %}
+          result
+        {% else %}
+          results
+        {% endif %}
+        for "{{ search_query }}"
+      </div>
+
+      {%- if results_list and results_list | length > 0 -%}
+        {{ product_ui.grid(results_list) }}
+      {%- else -%}
+        <p class="search-empty">
+          We couldn't find anything for "{{ search_query }}". Try a different search term.
+        </p>
+      {%- endif -%}
+    {%- else -%}
+      <p class="search-empty">
+        Enter a search term to find products in our catalog.
+      </p>
+    {%- endif -%}
+  </section>
+{% endblock %}

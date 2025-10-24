@@ -1,14 +1,9 @@
 use anyhow::Result;
-use axum::{serve, Router};
+use axum::{Router, serve};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
-use crate::{
-    db::Repo,
-    http::build_router,
-    templates::TemplateService,
-    tenancy::TenantResolver,
-};
+use crate::{db::Repo, http::build_router, templates::TemplateService, tenancy::TenantResolver};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -18,8 +13,8 @@ pub struct AppState {
 }
 
 pub async fn run() -> Result<()> {
-    let db_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not set");
-    let repo = Repo::new(&db_url).await?;
+    let routes_file = std::env::var("ROUTES_FILE").unwrap_or_else(|_| "config/routes.json".into());
+    let repo = Repo::new(&routes_file).await?;
     let template_dir = std::env::var("TEMPLATE_DIR").unwrap_or_else(|_| "templates".into());
 
     let state = AppState {

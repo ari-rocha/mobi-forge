@@ -1,0 +1,4 @@
+{% macro tenant_href(path='') -%}
+  {%- set cleaned = (path | default('', true) | trim('/')) -%}
+  /@{{ site.slug }}{% if cleaned %}/{{ cleaned }}{% endif %}
+{%- endmacro %}

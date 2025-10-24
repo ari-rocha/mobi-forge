@@ -1,0 +1,46 @@
+{
+  "tenants": ["demo", "store"],
+  "routes": {
+    "store": [
+      {
+        "path": "/",
+        "template_name": "pages/home.html",
+        "data_source": {
+          "provider": "mock_file",
+          "path": "store/pages/home.json"
+        }
+      },
+      {
+        "path": "/catalog",
+        "template_name": "pages/catalog.html",
+        "data_source": {
+          "provider": "mock_file",
+          "path": "store/pages/catalog.json"
+        }
+      },
+      {
+        "path": "/search",
+        "template_name": "pages/search.html",
+        "data_source": {
+          "provider": "mock_file",
+          "path": "store/pages/search.json"
+        }
+      },
+      {
+        "path": "/product",
+        "template_name": "pages/product.html",
+        "data_source": {
+          "provider": "mock_file",
+          "path": "store/pages/product.json"
+        }
+      }
+    ],
+    "demo": [
+      {
+        "path": "/",
+        "template_name": "index.html",
+        "data_source": { "provider": "static", "payload": {} }
+      }
+    ]
+  }
+}

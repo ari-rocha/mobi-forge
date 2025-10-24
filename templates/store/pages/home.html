@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+{% import 'macros/utils.jinja' as util %}
+
+{% block title %}{{ page.title or 'Demo Store' }} — {{ site.title }}{% endblock %}
+
+{% block hero %}
+  <section class="hero">
+    <h2>{{ page.hero.heading }}</h2>
+    <p>{{ page.hero.subheading }}</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ util.tenant_href('catalog') }}">
+        View catalog
+      </a>
+      <a class="btn btn-secondary" href="{{ util.tenant_href('search') }}">
+        Search products
+      </a>
+    </div>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="section">
+    <h2>{{ page.overview.title }}</h2>
+    <p>{{ page.overview.description }}</p>
+  </section>
+
+  {% if page.checklist %}
+    <section class="section">
+      <h2>{{ page.checklist.title }}</h2>
+      <div class="feature-grid">
+        {% for item in page.checklist.items %}
+          <article class="feature-card">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+            {% if item.link %}
+              <a class="btn btn-secondary" href="{{ util.tenant_href(item.link) }}">
+                {{ item.cta | default('Open') }}
+              </a>
+            {% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

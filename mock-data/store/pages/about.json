@@ -1,0 +1,58 @@
+{
+  "site": {
+    "title": "Mobi Store",
+    "slug": "store"
+  },
+  "page": {
+    "title": "About",
+    "heading": "Purpose-built retail storytelling",
+    "subheading": "Mobi Store is a conceptual storefront that demonstrates how merchants can launch content-rich experiences across multiple tenants."
+  },
+  "story": {
+    "origin": {
+      "title": "Born from merchant feedback",
+      "copy": "We prototyped this tenant after interviewing 40+ Mobi merchants about the blockers they face when experimenting with new verticals. Templates and mock data let teams preview the end result before the API integration is ready."
+    },
+    "mission": {
+      "title": "Design freely, integrate later",
+      "copy": "By separating content, data mocks, and templates, you can evolve storytelling faster than backend timelines. When the live MobiCMS endpoints are ready, simply swap the data provider without rebuilding the UI."
+    }
+  },
+  "values": {
+    "title": "What guides the experience",
+    "items": [
+      {
+        "title": "Sustainable defaults",
+        "description": "Every component highlights how eco-minded retailers merchandise products and tell impact stories."
+      },
+      {
+        "title": "Composable design",
+        "description": "Macros and partials keep layouts consistent while giving you freedom to rearrange sections per tenant."
+      },
+      {
+        "title": "Launch velocity",
+        "description": "Mock data unlocks stakeholder reviews without waiting on integrations or production content."
+      }
+    ]
+  },
+  "timeline": {
+    "title": "Release highlights",
+    "events": [
+      {
+        "year": "2023",
+        "title": "Template research",
+        "copy": "Interviewed multi-tenant retailers using MobiCMS and gathered common merchandising patterns."
+      },
+      {
+        "year": "2024",
+        "title": "Mock data toolkit",
+        "copy": "Shipped the mock data provider so teams can iterate on product storytelling offline."
+      },
+      {
+        "year": "2025",
+        "title": "Storefront beta",
+        "copy": "Released the store tenant templates you are viewing now, ready to wire into live product feeds."
+      }
+    ]
+  }
+}

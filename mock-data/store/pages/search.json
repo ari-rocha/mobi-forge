@@ -1,0 +1,20 @@
+{
+  "site": {
+    "title": "Mobi Store",
+    "slug": "store"
+  },
+  "page": {
+    "title": "Search",
+    "heading": "Search the catalog",
+    "description": "This search view uses the live MobiCMS furniture API.",
+    "query": ""
+  },
+  "results": {
+    "provider": "http",
+    "url": "https://api.mobicms.com.br/api/furnitures?pageSize=20&pageIndex=0&search={{q}}",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer {{env.MOBI_API_TOKEN}}"
+    }
+  }
+}

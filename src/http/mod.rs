@@ -32,38 +32,103 @@ struct TemplateOverride {
     template: Option<String>,
 }
 
+#[derive(Default, Deserialize)]
+struct QueryParams {
+    #[serde(flatten)]
+    params: serde_json::Map<String, serde_json::Value>,
+}
+
 async fn render_dynamic(
     headers: HeaderMap,
     Query(template_override): Query<TemplateOverride>,
+    Query(query_params): Query<QueryParams>,
     Path(TenantPath { tenant, path }): Path<TenantPath>,
     State(state): State<AppState>,
 ) -> Result<Html<String>, (StatusCode, String)> {
     let clean_path = path.unwrap_or_else(|| "/".to_string());
+    let db_path = if clean_path.starts_with('/') {
+        clean_path.clone()
+    } else {
+        format!("/{}", clean_path)
+    };
+    let normalized_path = clean_path.trim_start_matches('/');
+    let mut params_map = query_params.params.clone();
+    let product_slug = normalized_path
+        .strip_prefix("products/")
+        .filter(|slug| !slug.is_empty())
+        .map(|slug| slug.to_string());
+    if let Some(slug) = &product_slug {
+        params_map.insert("slug".to_string(), json!(slug));
+        params_map.insert("product_slug".to_string(), json!(slug));
+        params_map.insert("product_id".to_string(), json!(slug));
+    }
 
     let tenant = state
         .tenants
         .resolve(&headers, &tenant)
         .await
         .map_err(internal)?;
-    let route = state
+    let mut route = state
         .repo
-        .find_route(&tenant, &clean_path)
+        .find_route(&tenant, &db_path)
         .await
         .map_err(internal)?;
+    if route.is_none() {
+        if normalized_path == "product" {
+            route = state
+                .repo
+                .find_route(&tenant, "/product")
+                .await
+                .map_err(internal)?;
+        } else if product_slug.is_some() {
+            route = state
+                .repo
+                .find_route(&tenant, "/product")
+                .await
+                .map_err(internal)?;
+        }
+    }
 
     let template_name = template_override
         .template
         .clone()
         .or_else(|| route.as_ref().map(|r| r.template_name.clone()))
+        .or_else(|| {
+            if product_slug.is_some() {
+                Some("pages/product.html".to_string())
+            } else {
+                None
+            }
+        })
         .unwrap_or_else(|| infer_template_name(&clean_path));
 
     let data_source = route
         .as_ref()
         .map(|r| r.data_source.clone())
-        .unwrap_or_else(|| json!({ "provider": "static", "payload": {} }));
+        .unwrap_or_else(|| {
+            if product_slug.is_some() {
+                let product_source = json!({
+                    "provider": "http",
+                    "url": "https://api.mobicms.com.br/api/furnitures/{{product_id}}",
+                    "method": "GET",
+                    "headers": {
+                        "Authorization": "Bearer {{env.MOBI_API_TOKEN}}"
+                    }
+                });
+                json!({
+                    "provider": "static",
+                    "payload": {
+                        "product": product_source
+                    }
+                })
+            } else {
+                json!({ "provider": "static", "payload": {} })
+            }
+        });
 
     let env = state.tmpl.env_for(&tenant).await.map_err(internal)?;
-    let ctx = ContextBuilder::from_source(&state.repo, &tenant, &data_source)
+    let ctx =
+        ContextBuilder::from_source(&state.repo, &tenant, &data_source, &params_map)
         .await
         .map_err(internal)?;
 

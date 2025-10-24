@@ -1,0 +1,85 @@
+{% extends 'layout.html' %} {% import 'macros/products.jinja' as products %} {%
+import 'macros/utils.jinja' as util %} {% block title %}{{ product.title or
+product.name }} — {{ site.title }}{% endblock %} {% block content %}
+<section class="section product-detail">
+  <div class="product-detail__grid">
+    <div class="product-detail__gallery">
+      {%- set images = product.images | default([], true) -%} {%- set
+      primary_image = product.image or (images | first) -%} {%- if primary_image
+      is mapping -%} {%- set image_src = primary_image.src or primary_image.url
+      or primary_image.fullPath or primary_image.full_path or primary_image.path
+      -%} {%- set image_alt = primary_image.alt or primary_image.title or
+      product.title or product.name -%} {%- else -%} {%- set image_src =
+      primary_image -%} {%- set image_alt = product.title or product.name -%}
+      {%- endif -%} {%- if image_src %}
+      <img src="{{ image_src }}" alt="{{ image_alt }}" />
+      {%- endif %} {%- if images | length > 1 %}
+      <div class="product-detail__thumbnails">
+        {%- for img in images %} {%- if img is mapping -%} {%- set thumb_src =
+        img.src or img.url or img.fullPath or img.full_path or img.path -%} {%-
+        set thumb_alt = img.alt or img.title or 'Product image' -%} {%- else -%}
+        {%- set thumb_src = img -%} {%- set thumb_alt = 'Product image' -%} {%-
+        endif -%} {%- if thumb_src %}
+        <img src="{{ thumb_src }}" alt="{{ thumb_alt }}" />
+        {%- endif %} {%- endfor %}
+      </div>
+      {%- endif %}
+    </div>
+
+    <div class="product-detail__info">
+      <h1>{{ product.title or product.name }}</h1>
+
+      {%- set price_obj = product.price if product.price is defined else none
+      -%} {%- if price_obj is mapping -%} {%- set amount = price_obj.amount or
+      price_obj.value or price_obj.price or price_obj.amountCents or
+      price_obj.amount_cents -%} {%- set currency = price_obj.currency or
+      price_obj.currencyCode or price_obj.currency_code or 'USD' -%} {%- else
+      -%} {%- set amount = price_obj -%} {%- set currency = product.currency or
+      product.currency_code or 'USD' -%} {%- endif -%}
+
+      <div class="product-detail__price">
+        {{ products.money(amount, currency) }}
+      </div>
+      {%- set description = product.snippet or product.quickDescription or
+      product.description or product.quickSpecifications or '' -%} {%- if
+      description %}
+      <div class="product-detail__description">
+        <div>
+          <h2>Description</h2>
+          <p>{{ description }}</p>
+        </div>
+      </div>
+      {%- endif %} {%- set specs = product.specifications %} {%- if specs %}
+      <div class="product-detail__section">
+        <h2>Specifications</h2>
+        <p>{{ specs }}</p>
+      </div>
+      {%- endif %}
+
+      <div class="product-detail__meta">
+        {%- if product.width %}
+        <div>
+          <dt>Width</dt>
+          <dd>{{ product.width }}</dd>
+        </div>
+        {%- endif %} {%- if product.height %}
+        <div>
+          <dt>Height</dt>
+          <dd>{{ product.height }}</dd>
+        </div>
+        {%- endif %} {%- if product.depth %}
+        <div>
+          <dt>Depth</dt>
+          <dd>{{ product.depth }}</dd>
+        </div>
+        {%- endif %} {%- if product.weight %}
+        <div>
+          <dt>Weight</dt>
+          <dd>{{ product.weight }}</dd>
+        </div>
+        {%- endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,109 @@
+{
+  "site": {
+    "title": "Mobi Store",
+    "slug": "store"
+  },
+  "breadcrumbs": [
+    { "label": "Home", "href": "" },
+    { "label": "Catalog", "href": "catalog" },
+    { "label": "Morning reset", "href": "catalog?tag=morning" },
+    { "label": "Evergreen Bamboo Toothbrush" }
+  ],
+  "product": {
+    "slug": "bamboo-toothbrush",
+    "title": "Evergreen Bamboo Toothbrush",
+    "description": "A compostable toothbrush crafted from FSC-certified bamboo with plant-based, BPA-free bristles. Designed for medium softness and a comfortable ergonomic grip.",
+    "price": { "amount": 8.5, "currency": "USD" },
+    "badges": ["Best Seller", "Plastic-Free", "FSC Certified"],
+    "availability": "In stock · Ships in 1-2 days",
+    "shipping": "Carbon-neutral shipping on orders over $60",
+    "sku": "MB-ST-001",
+    "cta": { "label": "Add to cart" },
+    "highlights": [
+      "Bristles made from castor bean oil",
+      "Ergonomic grip treated with food-safe oil",
+      "Compostable within 6 months in industrial facilities"
+    ],
+    "images": [
+      {
+        "src": "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80",
+        "alt": "Close-up of bamboo toothbrush on linen cloth"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1508747703725-719777637510?auto=format&fit=crop&w=900&q=80",
+        "alt": "Bathroom counter with bamboo toothbrushes in cup"
+      },
+      {
+        "src": "https://images.unsplash.com/photo-1517089596392-fb9a9033e05b?auto=format&fit=crop&w=900&q=80",
+        "alt": "Hand holding bamboo toothbrush"
+      }
+    ],
+    "details": [
+      {
+        "title": "Materials",
+        "copy": "Handle is 100% rapidly renewable bamboo finished with an organic beeswax seal. Bristles are made from castor bean oil and can be recycled through Mobi's take-back program."
+      },
+      {
+        "title": "Care instructions",
+        "copy": "Rinse and dry upright after each use. Replace every 3 months or when bristles naturally soften. Compost the handle and recycle the bristles separately."
+      },
+      {
+        "title": "Impact",
+        "copy": "Every purchase funds shoreline cleanups through our partnership with SeaChange. Packaging is printed with soy inks on recycled kraft paper."
+      }
+    ]
+  },
+  "reviews": {
+    "title": "Customer reviews",
+    "items": [
+      {
+        "author": "Camille R.",
+        "rating": 5,
+        "body": "Beautiful design and noticeably softer on my gums. The handle feels premium compared to other bamboo brushes."
+      },
+      {
+        "author": "Jordan P.",
+        "rating": 4,
+        "body": "Love the castor bristles and sustainability story. I pair it with the Everclean stand and it looks great on the vanity."
+      }
+    ]
+  },
+  "related": {
+    "title": "Pairs well with",
+    "items": [
+      {
+        "slug": "reusable-bottle",
+        "title": "Cascade Glass Water Bottle",
+        "snippet": "Double-walled glass bottle with cork sleeve and bamboo lid.",
+        "price": { "amount": 32, "currency": "USD" },
+        "image": {
+          "src": "https://images.unsplash.com/photo-1526402463860-0febc2cd6485?auto=format&fit=crop&w=600&q=80",
+          "alt": "Reusable glass water bottle on marble counter"
+        },
+        "badges": ["New Arrival"]
+      },
+      {
+        "slug": "herbal-hand-soap",
+        "title": "Coastal Pines Hand Soap Refill",
+        "snippet": "Refillable concentrate with coastal pine, rosemary, and citrus.",
+        "price": { "amount": 18, "currency": "USD" },
+        "image": {
+          "src": "https://images.unsplash.com/photo-1619451427882-6cc4e2a5c8f0?auto=format&fit=crop&w=600&q=80",
+          "alt": "Amber soap bottle with sprigs"
+        },
+        "badges": ["Refill-Ready"]
+      },
+      {
+        "slug": "compostable-sponges",
+        "title": "Compostable Kitchen Sponge Set",
+        "snippet": "Plant cellulose sponges that break down at end-of-life.",
+        "price": { "amount": 12, "currency": "USD" },
+        "image": {
+          "src": "https://images.unsplash.com/photo-1616628182501-9d1ecb3fa7c0?auto=format&fit=crop&w=600&q=80",
+          "alt": "Compostable sponges stacked on counter"
+        },
+        "badges": ["Bundle & Save"]
+      }
+    ]
+  }
+}
