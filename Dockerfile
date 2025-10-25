@@ -17,7 +17,7 @@ RUN cargo build --release
 
 FROM debian:bookworm-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tini && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates tini curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -34,6 +34,8 @@ ENV TEMPLATE_DIR=templates \
     ROCKET_PORT=8080
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD curl -fS http://127.0.0.1:8080/health || exit 1
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
