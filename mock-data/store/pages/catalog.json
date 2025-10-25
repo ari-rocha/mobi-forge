@@ -6,7 +6,7 @@
   "page": {
     "title": "Catalog",
     "heading": "Explore the complete collection",
-    "description": "Browsing live products from the MobiCMS furniture API."
+    "description": "This catalog renders directly from the embedded furniture dataset shipped with the client."
   },
   "filters": {
     "groups": [
@@ -19,13 +19,5 @@
         ]
       }
     ]
-  },
-  "products": {
-    "provider": "http",
-    "url": "https://api.mobicms.com.br/api/furnitures?pageSize=100&pageIndex=0",
-    "method": "GET",
-    "headers": {
-      "Authorization": "Bearer {{env.MOBI_API_TOKEN}}"
-    }
   }
 }

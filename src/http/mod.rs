@@ -1,18 +1,23 @@
 use crate::{app::AppState, data::ContextBuilder};
 use axum::{
-    extract::{Path, Query, State},
-    http::{HeaderMap, StatusCode},
-    response::Html,
-    routing::get,
     Router,
+    body::Body,
+    extract::{Path, Query, State},
+    http::{HeaderMap, HeaderValue, StatusCode, header::CONTENT_TYPE},
+    response::{Html, Response},
+    routing::get,
 };
 use minijinja::ErrorKind as TemplateErrorKind;
 use serde::Deserialize;
 use serde_json::json;
+use std::path::{Component, Path as StdPath, PathBuf};
+use tokio::fs;
 
 pub fn build_router(state: AppState) -> Router {
     Router::new()
         .route("/health", get(|| async { "ok" }))
+        .route("/static/*path", get(serve_static))
+        .route("/favicon.ico", get(serve_favicon))
         .route("/@:tenant", get(render_dynamic))
         .route("/@:tenant/", get(render_dynamic))
         .route("/@:tenant/*path", get(render_dynamic))
@@ -127,8 +132,7 @@ async fn render_dynamic(
         });
 
     let env = state.tmpl.env_for(&tenant).await.map_err(internal)?;
-    let ctx =
-        ContextBuilder::from_source(&state.repo, &tenant, &data_source, &params_map)
+    let ctx = ContextBuilder::from_source(&state.repo, &tenant, &data_source, &params_map)
         .await
         .map_err(internal)?;
 
@@ -140,6 +144,62 @@ async fn render_dynamic(
         })?;
     let html = tpl.render(ctx).map_err(internal)?;
     Ok(Html(html))
+}
+
+async fn serve_static(Path(path): Path<String>) -> Result<Response, (StatusCode, String)> {
+    let clean_path = sanitize_path(&path).ok_or_else(|| {
+        (
+            StatusCode::BAD_REQUEST,
+            "invalid path segment requested".to_string(),
+        )
+    })?;
+
+    let base = PathBuf::from("static");
+    let full_path = base.join(clean_path);
+
+    let data = fs::read(&full_path).await.map_err(|err| match err.kind() {
+        std::io::ErrorKind::NotFound => (
+            StatusCode::NOT_FOUND,
+            format!("static asset not found: {}", full_path.display()),
+        ),
+        _ => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to read static asset: {err}"),
+        ),
+    })?;
+
+    let mime = mime_for(&full_path);
+    let mut response = Response::new(Body::from(data));
+    response.headers_mut().insert(
+        CONTENT_TYPE,
+        HeaderValue::from_str(mime)
+            .unwrap_or_else(|_| HeaderValue::from_static("application/octet-stream")),
+    );
+
+    Ok(response)
+}
+
+async fn serve_favicon() -> Result<Response, (StatusCode, String)> {
+    let base = PathBuf::from("static");
+    let full_path = base.join("favicon.ico");
+
+    let data = fs::read(&full_path).await.map_err(|err| match err.kind() {
+        std::io::ErrorKind::NotFound => (
+            StatusCode::NOT_FOUND,
+            format!("favicon not found: {}", full_path.display()),
+        ),
+        _ => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("failed to read favicon: {err}"),
+        ),
+    })?;
+
+    let mut response = Response::new(Body::from(data));
+    response
+        .headers_mut()
+        .insert(CONTENT_TYPE, HeaderValue::from_static("image/x-icon"));
+
+    Ok(response)
 }
 
 fn internal<E: std::fmt::Display>(e: E) -> (StatusCode, String) {
@@ -154,5 +214,40 @@ fn infer_template_name(path: &str) -> String {
         normalized.to_string()
     } else {
         format!("{normalized}.html")
+    }
+}
+
+fn sanitize_path(path: &str) -> Option<PathBuf> {
+    let mut clean = PathBuf::new();
+    for component in StdPath::new(path).components() {
+        match component {
+            Component::Normal(part) => clean.push(part),
+            Component::CurDir => {}
+            _ => return None,
+        }
+    }
+    Some(clean)
+}
+
+fn mime_for(path: &StdPath) -> &'static str {
+    match path
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(|s| s.to_ascii_lowercase())
+    {
+        Some(ext) => match ext.as_str() {
+            "js" | "mjs" => "application/javascript",
+            "json" => "application/json",
+            "css" => "text/css",
+            "html" => "text/html; charset=utf-8",
+            "wasm" => "application/wasm",
+            "svg" => "image/svg+xml",
+            "png" => "image/png",
+            "jpg" | "jpeg" => "image/jpeg",
+            "webp" => "image/webp",
+            "ico" => "image/x-icon",
+            _ => "application/octet-stream",
+        },
+        None => "application/octet-stream",
     }
 }

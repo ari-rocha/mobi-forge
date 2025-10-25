@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value as Json};
+use serde_json::{Value as Json, json};
 use std::{collections::HashMap, fs, path::Path, path::PathBuf, sync::Arc};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

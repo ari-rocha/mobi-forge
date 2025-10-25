@@ -1,5 +1,4 @@
 {% extends 'layout.html' %}
-{% import 'macros/products.jinja' as product_ui %}
 {% import 'macros/utils.jinja' as util %}
 
 {% block title %}{{ page.title }} — {{ site.title }}{% endblock %}
@@ -34,14 +33,16 @@
   </div>
   {% endif %}
 
-  {%- set product_source = products | default([], true) -%}
-  {%- set product_list = product_source.items
-      if product_source is mapping and product_source.items is defined
-      else product_source -%}
-  {%- if product_list and product_list | length > 0 -%}
-    {{ product_ui.grid(product_list) }}
-  {%- else -%}
-    <p class="product-grid__empty">No products available yet.</p>
-  {%- endif -%}
+  <div id="catalog-results" class="product-grid">
+    <p class="product-grid__empty">Loading catalog…</p>
+  </div>
 </section>
+<script
+  type="module"
+  src="/static/catalog-search-app.js"
+  data-module="catalog-search"
+  data-view="catalog"
+  data-site-slug="{{ site.slug }}"
+  data-results-target="#catalog-results"
+></script>
 {% endblock %}
