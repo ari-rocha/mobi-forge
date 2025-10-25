@@ -1,3 +1,4 @@
 /target
 .env
 catalog-search/target
+catalog-tools/target

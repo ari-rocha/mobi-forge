@@ -1,9 +1,8 @@
 # Catalog Search WASM Module
 
-This crate compiles the furniture and variation datasets into a compact
-[`bincode`](https://docs.rs/bincode/latest/bincode/) blob that ships inside the
-WebAssembly binary. The browser consumes the module to provide a completely
-offline catalog and search experience.
+This crate exposes the catalog search engine as a WebAssembly module. The
+compiled binary no longer embeds catalog data; instead the client code passes a
+`bincode` blob at runtime (typically fetched alongside the HTML).
 
 ## Building
 
@@ -18,16 +17,14 @@ offline catalog and search experience.
 
 3. The command generates `static/pkg/catalog_search.js` and the corresponding
    `.wasm` binary. The search templates import the module via
-   `/static/catalog-search-app.js`.
-
-The build script automatically reads the source data from
-`commerce-data/Furniture.json` and `commerce-data/Variation.json`, joins the
-records, and precomputes the text used for ranking search results.
+   `/static/catalog-search-app.js`, which fetches the catalog blob and passes it
+   into the `CatalogSearch` constructor.
 
 ## Development Tips
 
 - Re-run the `wasm-pack build` command whenever the source CSV/JSON files
-  change. The loader script performs a simple runtime check and will surface an
-  error banner if the WASM bundle is missing.
+  change. The loader script will surface an error banner if the WASM bundle
+  fails to load.
+- Catalog data can be produced with `catalog-tools` (see that crate's README).
 - The generated files are ignored by git via `static/.gitignore` to avoid
   committing large binaries.

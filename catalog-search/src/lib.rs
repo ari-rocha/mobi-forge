@@ -1,12 +1,10 @@
-mod model;
+pub mod model;
 
 use crate::model::{Catalog, Furniture};
 use bincode::Options;
 use serde::Serialize;
 use serde_wasm_bindgen::Serializer;
 use wasm_bindgen::prelude::*;
-
-const CATALOG_BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/catalog.bin"));
 
 #[wasm_bindgen]
 pub struct CatalogSearch {
@@ -45,11 +43,9 @@ struct VariationResult {
 #[wasm_bindgen]
 impl CatalogSearch {
     #[wasm_bindgen(constructor)]
-    pub fn new() -> Result<CatalogSearch, JsValue> {
-        let catalog: Catalog = bincode::options()
-            .with_fixint_encoding()
-            .deserialize(CATALOG_BYTES)
-            .map_err(to_js_error)?;
+    pub fn new(bytes: &[u8]) -> Result<CatalogSearch, JsValue> {
+        let mut catalog = decode_catalog(bytes).map_err(to_js_error)?;
+        prepare_catalog(&mut catalog);
         Ok(Self { catalog })
     }
 
@@ -114,8 +110,7 @@ impl CatalogSearch {
             .collect();
 
         items.sort_by(|a, b| {
-            compare_priority(a.priority, b.priority)
-                .then_with(|| compare_name(&a.name, &b.name))
+            compare_priority(a.priority, b.priority).then_with(|| compare_name(&a.name, &b.name))
         });
 
         items.truncate(limit);
@@ -222,21 +217,90 @@ fn to_js_error<E: std::fmt::Display>(err: E) -> JsValue {
     JsValue::from_str(&err.to_string())
 }
 
-#[cfg(all(test, not(target_arch = "wasm32")))]
-fn decode_catalog_for_tests() -> Catalog {
-    use bincode::Options;
+pub fn encode_catalog(catalog: &Catalog) -> bincode::Result<Vec<u8>> {
+    bincode::options().with_fixint_encoding().serialize(catalog)
+}
 
-    let options = bincode::options().with_fixint_encoding();
-    let mut de = bincode::de::Deserializer::from_slice(CATALOG_BYTES, options);
-    serde_path_to_error::deserialize(&mut de)
-        .unwrap_or_else(|err| panic!("bincode decode failed at {}: {}", err.path(), err))
+pub fn decode_catalog(bytes: &[u8]) -> bincode::Result<Catalog> {
+    bincode::options().with_fixint_encoding().deserialize(bytes)
+}
+
+pub fn prepare_catalog(catalog: &mut Catalog) {
+    for furniture in &mut catalog.items {
+        if furniture.searchable_text.trim().is_empty() {
+            furniture.searchable_text = build_searchable_text(furniture);
+        }
+    }
+}
+
+fn build_searchable_text(furniture: &Furniture) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    push_lower(&mut parts, furniture.name.as_deref());
+    push_lower(&mut parts, furniture.slug.as_deref());
+    push_lower(&mut parts, furniture.description_text.as_deref());
+    push_lower(&mut parts, furniture.quick_description.as_deref());
+    push_lower(&mut parts, furniture.quick_specifications.as_deref());
+    push_lower(&mut parts, furniture.specifications.as_deref());
+
+    for variation in &furniture.variations {
+        push_lower(&mut parts, variation.name.as_deref());
+        push_lower(&mut parts, variation.quick_description.as_deref());
+        push_lower(&mut parts, variation.quick_specifications.as_deref());
+        push_lower(&mut parts, variation.color.as_deref());
+        push_lower(&mut parts, variation.secondary_color.as_deref());
+    }
+
+    parts.join(" ")
+}
+
+fn push_lower(parts: &mut Vec<String>, value: Option<&str>) {
+    if let Some(text) = value {
+        let trimmed = text.trim();
+        if !trimmed.is_empty() {
+            parts.push(trimmed.to_lowercase());
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    #[cfg(not(target_arch = "wasm32"))]
+    use super::*;
+    use crate::model::{Catalog, Furniture, Variation};
+
+    fn sample_catalog() -> Catalog {
+        Catalog {
+            items: vec![Furniture {
+                id: "1".to_string(),
+                name: Some("Sample Chair".into()),
+                slug: Some("sample-chair".into()),
+                description_text: Some("A comfy chair for reading".into()),
+                quick_description: Some("Comfy reading chair".into()),
+                quick_specifications: Some("Leather; Walnut".into()),
+                price: Some(199.0),
+                variations: vec![Variation {
+                    id: "v1".into(),
+                    name: Some("Walnut".into()),
+                    color: Some("Brown".into()),
+                    ..Default::default()
+                }],
+                ..Default::default()
+            }],
+        }
+    }
+
     #[test]
-    fn catalog_decodes_with_native_bincode() {
-        super::decode_catalog_for_tests();
+    fn encode_decode_roundtrip() {
+        let catalog = sample_catalog();
+        let bytes = encode_catalog(&catalog).expect("encode");
+        let decoded = decode_catalog(&bytes).expect("decode");
+        assert_eq!(decoded.items.len(), 1);
+    }
+
+    #[test]
+    fn prepare_catalog_builds_searchable_text() {
+        let mut catalog = sample_catalog();
+        catalog.items[0].searchable_text.clear();
+        prepare_catalog(&mut catalog);
+        assert!(!catalog.items[0].searchable_text.is_empty());
     }
 }

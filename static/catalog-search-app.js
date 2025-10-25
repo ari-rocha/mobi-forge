@@ -13,6 +13,7 @@ async function bootstrap() {
     loaderScript?.dataset?.emptyTarget ?? "#search-empty";
   const formSelector = loaderScript?.dataset?.formSelector ?? ".search-form";
   const inputSelector = loaderScript?.dataset?.inputSelector ?? "#search-query";
+  const catalogUrl = loaderScript?.dataset?.catalogUrl ?? "/static/catalog.bin";
 
   let wasmModule;
   try {
@@ -49,9 +50,33 @@ async function bootstrap() {
     return;
   }
 
+  let catalogBytes;
+  try {
+    const response = await fetch(catalogUrl, {
+      cache: loaderScript?.dataset?.catalogCache ?? "no-store",
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    }
+    const buffer = await response.arrayBuffer();
+    catalogBytes = new Uint8Array(buffer);
+  } catch (error) {
+    console.error("Failed to load catalog data", error);
+    showStaticError(
+      emptyStateTarget,
+      "Unable to load the catalog dataset. Please try again later."
+    );
+    const container = document.querySelector(resultsTarget);
+    if (container) {
+      container.innerHTML =
+        '<p class="product-grid__empty">Failed to load catalog data.</p>';
+    }
+    return;
+  }
+
   let engine;
   try {
-    engine = new CatalogSearch();
+    engine = new CatalogSearch(catalogBytes);
   } catch (error) {
     console.error("Failed to construct CatalogSearch", error);
     showStaticError(

@@ -40,5 +40,6 @@
     data-empty-target="#search-empty"
     data-form-selector=".search-form"
     data-input-selector="#search-query"
+    data-catalog-url="{{ catalog_url | default('/static/catalog.bin', true) }}"
   ></script>
 {% endblock %}

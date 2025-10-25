@@ -44,5 +44,6 @@
   data-view="catalog"
   data-site-slug="{{ site.slug }}"
   data-results-target="#catalog-results"
+  data-catalog-url="{{ catalog_url | default('/static/catalog.bin', true) }}"
 ></script>
 {% endblock %}
